@@ -39,8 +39,17 @@
 #include "memwipe.h"
 
 #if defined(_MSC_VER)
+#include <intrin.h>
+/* MSVC accepts the __asm keyword on 32 bit x86 only. On x64 and ARM64
+ * it is:
+ *   error C4235: nonstandard extension used: '__asm' keyword not
+ *       supported on this architecture
+ * _ReadWriteBarrier is the compiler barrier available on every MSVC
+ * target, and a compiler barrier is what this needs: the point is to
+ * stop the optimiser discarding the memset which precedes it, the same
+ * job the memory clobber does in the GCC branch below. */
 #define SCARECROW \
-    __asm;
+    _ReadWriteBarrier();
 #else
 #define SCARECROW \
     __asm__ __volatile__("" : : "r"(ptr) : "memory");

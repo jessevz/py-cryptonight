@@ -47,7 +47,11 @@
  #include <sys/time.h>
 #endif
 
-#ifdef WIN32
+/* _WIN32 as well as WIN32: the former is predefined by MSVC and MinGW,
+ * the latter only by some build systems, and not by setup.py. Without
+ * this, a Windows build takes the POSIX branch and then calls _getpid
+ * below without having included <process.h> which declares it. */
+#if defined(WIN32) || defined(_WIN32)
 #include <process.h>
 #else
 #include <sys/types.h>
