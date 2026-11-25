@@ -45,6 +45,13 @@ These may be OR'd together.  */
 #define STDOUT_FILENO 1
 #define STDERR_FILENO 2
 /* should be in some equivalent to <sys/types.h> */
+#if defined(_MSC_VER) && _MSC_VER < 1600
+/* Visual Studio 2008 and older ship no <stdint.h>, so define the types
+ * this header's users need. Newer compilers have it, and repeating the
+ * typedefs there is an error:
+ *   error C2371: 'int8_t': redefinition; different basic types
+ * which is what any Windows build hit, because this header is on the
+ * include path for the whole project. */
 typedef __int8            int8_t;
 typedef __int16           int16_t;
 typedef __int32           int32_t;
@@ -53,5 +60,8 @@ typedef unsigned __int8   uint8_t;
 typedef unsigned __int16  uint16_t;
 typedef unsigned __int32  uint32_t;
 typedef unsigned __int64  uint64_t;
+#else
+#include <stdint.h>
+#endif
 
 #endif /* unistd.h  */
