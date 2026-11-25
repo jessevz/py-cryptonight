@@ -100,7 +100,14 @@ static inline int use_v4_jit(void)
 #endif
 }
 
-#if defined(__x86_64__) || defined(__aarch64__)
+/* MSVC spells these architectures _M_X64 and _M_ARM64, so without them
+ * the definition disappears while the two calls to it, in code which is
+ * explicitly MSVC-aware, remain:
+ *   error C3861: 'force_software_aes': identifier not found
+ * The body is portable, getenv and strcmp, so it only needs to be
+ * visible on the architectures which call it. */
+#if defined(__x86_64__) || defined(__aarch64__) \
+    || defined(_M_X64) || defined(_M_ARM64)
 static inline int force_software_aes(void)
 {
   static int use = -1;
